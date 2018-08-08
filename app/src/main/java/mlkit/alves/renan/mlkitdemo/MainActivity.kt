@@ -20,14 +20,11 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.choose_from_dialog.*
 import org.jetbrains.anko.alert
 import java.io.File
 
@@ -214,9 +211,14 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
         val detector = FirebaseVision.getInstance().visionTextDetector
 
         detector.detectInImage(image)
-                .addOnCompleteListener {
+                .addOnCompleteListener { it ->
                     var detectedText = ""
-                    it.result.blocks.forEach { detectedText += "${it.text} " }
+
+                    it.result.blocks.forEach { line ->
+                        line.lines.forEach {
+                            detectedText += "${it.text}\n"
+                        }
+                    }
 
                     runOnUiThread {
                         txtOutput.text = detectedText
