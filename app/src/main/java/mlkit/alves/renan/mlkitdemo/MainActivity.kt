@@ -26,6 +26,7 @@ import com.google.firebase.ml.vision.FirebaseVision
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.progressDialog
 import java.io.File
 
 class MainActivity : AppCompatActivity() , View.OnClickListener{
@@ -210,6 +211,9 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
         val image = FirebaseVisionImage.fromBitmap(bitmap!!)
         val detector = FirebaseVision.getInstance().visionTextDetector
 
+        val progress = progressDialog("Processing the image...")
+        progress.show()
+
         detector.detectInImage(image)
                 .addOnCompleteListener { it ->
                     var detectedText = ""
@@ -222,10 +226,12 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
 
                     runOnUiThread {
                         txtOutput.text = detectedText
+                        progress.dismiss()
                     }
                 }
                 .addOnFailureListener {
                     runOnUiThread {
+                        progress.dismiss()
                         alert("Something went wrong", "=(").show()
                     }
                 }
