@@ -9,7 +9,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
@@ -29,8 +28,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.progressDialog
 import java.io.File
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 
 class MainActivity : AppCompatActivity() , View.OnClickListener{
 
@@ -219,32 +216,26 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
 
         detector.detectInImage(image)
                 .addOnCompleteListener { it ->
+                    val regex = """^ ?[a-zA-Z]{3}-? ?\d{4} ?$""".toRegex()
+
                     var detectedText = ""
                     var countMatches = 0
-                    val pattern = Pattern.compile("(^ ?[a-zA-Z]{3}-? ?\\d{4} ?$)")
 
                     it.result.blocks.forEach {
                         it.lines.forEach {
-                            for (i in it.elements.indices) {
-                                val matcher = pattern.matcher(it.elements[i].text)
-                                if (matcher.find()) {
-                                    countMatches += 1
-                                    detectedText += "${matcher.group()}\n"
-                                }
+                            for (i in it.elements.indices) if (regex.matches(it.elements[i].text)) {
+                                detectedText += "${it.elements[i].text}\n"
+                                countMatches++
                             }
                         }
                     }
 
-                    runOnUiThread {
-                         txtOutput.text = "Recorrências de placas na imagem: $countMatches\n Placas detectadas:\n $detectedText"
-                        progress.dismiss()
-                    }
+                    txtOutput.text = "Recorrências de placas na imagem: $countMatches\nPlacas detectadas:\n $detectedText"
+                    progress.dismiss()
                 }
                 .addOnFailureListener {
-                    runOnUiThread {
-                        progress.dismiss()
-                        alert("Something went wrong", "=(").show()
-                    }
+                    progress.dismiss()
+                    alert("Something went wrong", "=(").show()
                 }
     }
 
