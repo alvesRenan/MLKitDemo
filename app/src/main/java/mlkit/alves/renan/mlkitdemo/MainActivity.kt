@@ -221,7 +221,7 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
                 .addOnCompleteListener { it ->
                     var detectedText = ""
                     var countMatches = 0
-                    val pattern = Pattern.compile("(^[a-zA-Z]{3}-? ?\\d{4}\$)")
+                    val pattern = Pattern.compile("(^ ?[a-zA-Z]{3}-? ?\\d{4} ?$)")
 
                     it.result.blocks.forEach {
                         it.lines.forEach {
@@ -231,19 +231,12 @@ class MainActivity : AppCompatActivity() , View.OnClickListener{
                                     countMatches += 1
                                     detectedText += "${matcher.group()}\n"
                                 }
-
-                                // more details about the text
-//                                detectedText += if (matcher.find()) {
-//                                    "Placa detectada = ${matcher.group()}\n"
-//                                } else {
-//                                    "Texto detectado = ${it.elements[i].text}\n"
-//                                }
                             }
                         }
                     }
 
                     runOnUiThread {
-                        txtOutput.text = "Recorrências de placas na imagem: $countMatches\n Placas detectadas:\n $detectedText"
+                         txtOutput.text = "Recorrências de placas na imagem: $countMatches\n Placas detectadas:\n $detectedText"
                         progress.dismiss()
                     }
                 }
